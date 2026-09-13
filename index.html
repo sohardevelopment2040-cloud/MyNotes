@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدونتي</title>
+
+    <!-- إعدادات PWA للهواتف -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6c5ce7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مدونتي">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <style>
+        /* استدعاء خط المهند */
+        @font-face {
+            font-family: 'AlMohanad';
+            src: url('https://a-habib.github.io/font/almohanad-bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Amiri:wght@400;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --purple: #6c5ce7;
+            --purple-light: #a29bfe;
+            --purple-dark: #5f3dc4;
+            --pink: #ff6b9d;
+            --teal: #00cec9;
+            --orange: #ffa502;
+            --mint: #55efc4;
+            --sky: #74b9ff;
+            --coral: #ff7675;
+            --green: #00b894;
+            --red: #d63031;
+
+            --bg-main: #fef6ff;
+            --bg-card: #ffffff;
+            --bg-soft: #faf5ff;
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            --shadow-sm: 0 2px 8px rgba(108, 92, 231, 0.08);
+            --shadow-md: 0 8px 25px rgba(108, 92, 231, 0.12);
+            --shadow-lg: 0 15px 40px rgba(108, 92, 231, 0.18);
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg-main);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* خلفية وزخارف */
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 15% 20%, rgba(255, 107, 157, 0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 85% 60%, rgba(108, 92, 231, 0.08) 0%, transparent 40%);
+            z-index: -1; animation: bgFloat 15s ease-in-out infinite alternate;
+        }
+        @keyframes bgFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(20px, -20px) scale(1.05); } }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #a29bfe 75%, #6c5ce7 100%);
+            padding: 30px 20px 60px; text-align: center; position: relative;
+        }
+        .diary-icon { font-size: 60px; margin-bottom: 8px; animation: iconFloat 3s ease-in-out infinite; }
+        @keyframes iconFloat { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+        .header h1 { font-family: 'Amiri', serif; font-size: 3em; font-weight: 700; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.2); margin-bottom: 5px; }
+        .header .subtitle { font-size: 1em; color: rgba(255, 255, 255, 0.9); font-weight: 500; letter-spacing: 3px; }
+
+        /* بطاقة التاريخ */
+        .date-card {
+            max-width: 500px; margin: -35px auto 20px; background: #fff; border-radius: 25px;
+            padding: 15px 25px; box-shadow: var(--shadow-lg); display: flex; align-items: center; justify-content: center; gap: 15px; position: relative; z-index: 10;
+        }
+        .date-card::before { content: '📅'; font-size: 2em; }
+        .date-day { font-size: 1.2em; font-weight: 900; color: var(--purple-dark); }
+        .date-full { font-size: 0.9em; color: var(--text-secondary); }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 0 15px 40px; }
+
+        /* شريط الإحصائيات السريعة */
+        .stats-bar {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #fff; border-radius: 16px; padding: 14px 8px; text-align: center; box-shadow: var(--shadow-sm);
+            border-bottom: 4px solid var(--purple);
+        }
+        .stat-box .stat-num { font-size: 1.6em; font-weight: 900; color: var(--purple-dark); display: block; }
+        .stat-box .stat-label { font-size: 0.75em; color: var(--text-secondary); font-weight: 600; }
+        .stat-box.orange { border-bottom-color: var(--orange); }
+        .stat-box.orange .stat-num { color: var(--orange); }
+        .stat-box.teal { border-bottom-color: var(--teal); }
+        .stat-box.teal .stat-num { color: #00a8a3; }
+        .stat-box.green { border-bottom-color: var(--green); }
+        .stat-box.green .stat-num { color: var(--green); }
+
+        /* أزرار عامة (نسخ احتياطي / استيراد / تنبيهات) */
+        .toolbar {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
+        }
+        .tool-btn {
+            flex: 1; min-width: 120px; background: #fff; border: 2px solid var(--purple-light); color: var(--purple-dark) !important;
+            border-radius: 12px; padding: 10px 8px; font-family: 'Tajawal', sans-serif; font-weight: 700;
+            font-size: 0.9em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: 0.2s;
+        }
+        .tool-btn:hover { background: var(--bg-soft); }
+        .tool-btn.notif-on { border-color: var(--green); color: var(--green) !important; }
+
+        /* التبويبات */
+        .tabs-wrapper {
+            background: #fff; border-radius: 20px; padding: 8px; margin-bottom: 25px;
+            box-shadow: var(--shadow-md); display: flex; gap: 6px;
+        }
+        .tab-btn {
+            flex: 1; padding: 14px; border: none; background: transparent; border-radius: 14px;
+            font-family: 'Tajawal', sans-serif; font-size: 0.95em; font-weight: 700; color: var(--text-secondary);
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .tab-btn:hover { background: var(--bg-soft); }
+        .tab-btn.active { color: white; transform: translateY(-2px); }
+        .tab-btn[data-tab="meetings"].active { background: linear-gradient(135deg, var(--sky), var(--purple)); box-shadow: 0 8px 20px rgba(108, 92, 231, 0.35); }
+        .tab-btn[data-tab="inquiries"].active { background: linear-gradient(135deg, var(--orange), var(--pink)); box-shadow: 0 8px 20px rgba(255, 165, 2, 0.35); }
+        .tab-btn[data-tab="reminders"].active { background: linear-gradient(135deg, var(--teal), var(--mint)); box-shadow: 0 8px 20px rgba(0, 206, 201, 0.35); }
+
+        .tab-content { display: none; animation: fadeInUp 0.4s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* =========================================
+           تعديلات الخط (المهند + أسود + بولد)
+           ========================================= */
+        #meetings *,
+        #inquiries *,
+        #reminders * {
+            font-family: 'AlMohanad', 'Amiri', serif !important;
+            color: #000000;
+            font-weight: bold;
+        }
+
+        /* الاجتماعات */
+        #meetings .add-card { background: #fff; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: var(--shadow-md); border-top: 5px solid var(--purple); }
+        #meetings .add-title { font-size: 1.4em; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+        #meetings .add-title .title-icon { font-family: 'Tajawal', sans-serif !important; font-size: 1.2em; background: linear-gradient(135deg, var(--sky), var(--purple)); color: white; padding: 5px 10px; border-radius: 10px; }
+
+        #meetings .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        #meetings .form-field { display: flex; flex-direction: column; }
+        #meetings .form-field.full { grid-column: 1 / -1; }
+        #meetings .form-field label { font-size: 1.1em; margin-bottom: 6px; }
+
+        #meetings .form-field input,
+        #meetings .form-field select {
+            background: #f4f4f4; border: 2px solid #ddd; border-radius: 10px; padding: 12px 15px;
+            font-size: 1.1em; outline: none; transition: 0.3s; color: #000; width: 100%;
+        }
+
+        #meetings .form-field select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            padding-left: 35px;
+        }
+
+        #meetings .form-field input:focus,
+        #meetings .form-field select:focus { border-color: var(--purple); background: #fff; }
+
+        #meetings .btn-add {
+            width: 100%; padding: 14px; border: none; border-radius: 12px; color: white !important;
+            font-size: 1.2em; cursor: pointer; background: linear-gradient(135deg, var(--sky), var(--purple));
+        }
+        #meetings .btn-add.editing, #inquiries .btn-add.editing, #reminders .btn-add.editing {
+            background: linear-gradient(135deg, var(--orange), var(--red)) !important;
+        }
+        .btn-cancel-edit {
+            width: 100%; margin-top: 8px; padding: 10px; border: 2px dashed #aaa; background: transparent;
+            border-radius: 10px; color: #555 !important; font-family: 'Tajawal', sans-serif !important;
+            font-weight: 700 !important; cursor: pointer; display: none;
+        }
+        .btn-cancel-edit.show { display: block; }
+
+        #meetings .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
+        #meetings .section-title { font-size: 1.3em; display: flex; align-items: center; gap: 8px; }
+
+        #meetings .btn-wa-all {
+            background: #25D366; color: #fff !important; border: none; padding: 8px 15px;
+            border-radius: 10px; cursor: pointer; font-size: 1.1em; display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); transition: 0.3s;
+        }
+        #meetings .btn-print {
+            background: var(--purple-dark); color: #fff !important; border: none; padding: 8px 15px;
+            border-radius: 10px; cursor: pointer; font-size: 1.1em; display: flex; align-items: center; gap: 5px;
+        }
+
+        .search-box {
+            background: #fff; border-radius: 14px; padding: 10px 15px; margin-bottom: 15px; box-shadow: var(--shadow-sm);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .search-box input {
+            border: none; outline: none; flex: 1; font-family: 'Tajawal', sans-serif !important; font-size: 1em !important;
+            font-weight: 500 !important; color: #000 !important; background: transparent;
+        }
+
+        #meetings .item-card, #inquiries .item-card, #reminders .item-card {
+            background: #fff; border-radius: 15px; padding: 18px; margin-bottom: 12px;
+            box-shadow: var(--shadow-sm); border-right: 5px solid var(--purple);
+            background: linear-gradient(to left, #fff, #fafafa);
+        }
+        #meetings .item-header, #inquiries .item-header, #reminders .item-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        #meetings .item-title, #inquiries .item-title, #reminders .item-title { font-size: 1.4em; }
+        .item-actions { display: flex; gap: 8px; }
+        .action-btn {
+            width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer;
+            font-family: 'Tajawal', sans-serif !important; font-size: 1.1em; color: #fff !important;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .action-btn.wa-btn { background: #25D366; }
+        .action-btn.del-btn { background: var(--coral); }
+        .action-btn.img-btn { background: var(--orange); }
+        .action-btn.edit-btn { background: var(--sky); }
+
+        .item-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .meta-badge {
+            background: #e8e8e8; padding: 6px 12px; border-radius: 8px; font-size: 1.1em;
+            display: inline-flex; align-items: center; gap: 5px; border: 1px solid #ccc;
+        }
+        .status-badge {
+            padding: 6px 14px; border-radius: 8px; font-size: 1.05em; color: #fff !important;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .status-badge.pending { background: var(--orange); }
+        .status-badge.done { background: var(--green); }
+        .status-badge.rejected { background: var(--red); }
+
+        /* =========================================
+           قسم الاستفسار عن معاملة
+           ========================================= */
+        #inquiries .add-card { background: #fff; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: var(--shadow-md); border-top: 5px solid var(--orange); }
+        #inquiries .add-title { font-size: 1.4em; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+        #inquiries .title-icon { width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white !important; background: linear-gradient(135deg, var(--orange), var(--pink)); }
+
+        #inquiries .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        #inquiries .form-field { display: flex; flex-direction: column; }
+        #inquiries .form-field.full { grid-column: 1 / -1; }
+        #inquiries .form-field label { font-size: 1.1em; margin-bottom: 6px; }
+
+        #inquiries .form-field input,
+        #inquiries .form-field select,
+        #inquiries .form-field textarea {
+            background: #f4f4f4; border: 2px solid #ddd; border-radius: 10px; padding: 12px 15px;
+            font-size: 1.1em; outline: none; transition: 0.3s; color: #000; width: 100%;
+        }
+        #inquiries .form-field select {
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: left 15px center; padding-left: 35px;
+        }
+        #inquiries .form-field textarea { min-height: 80px; resize: vertical; }
+        #inquiries .btn-add {
+            width: 100%; padding: 14px; border: none; border-radius: 12px; color: white !important;
+            font-size: 1.2em; cursor: pointer; background: linear-gradient(135deg, var(--orange), var(--pink));
+        }
+
+        .file-upload-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: #f4f4f4; border: 2px dashed var(--orange); border-radius: 10px;
+            padding: 12px; cursor: pointer; transition: 0.3s; text-align: center;
+        }
+        .file-upload-btn:hover { background: #fff5eb; }
+        .preview-img-container { margin-top: 10px; display: none; text-align: center; }
+        .preview-img-container img { max-width: 100%; max-height: 150px; border-radius: 10px; border: 2px solid #ddd; }
+
+        /* =========================================
+           قسم التذكيرات
+           ========================================= */
+        #reminders .add-card { background: #fff; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: var(--shadow-md); border-top: 5px solid var(--teal); }
+        #reminders .add-title { font-size: 1.4em; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+        #reminders .title-icon { width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white !important; background: linear-gradient(135deg, var(--teal), var(--mint)); }
+
+        #reminders .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        #reminders .form-field { display: flex; flex-direction: column; }
+        #reminders .form-field.full { grid-column: 1 / -1; }
+        #reminders .form-field label { font-size: 1.1em; margin-bottom: 6px; }
+
+        #reminders .form-field input,
+        #reminders .form-field select,
+        #reminders .form-field textarea {
+            background: #f4f4f4; border: 2px solid #ddd; border-radius: 10px; padding: 12px 15px;
+            font-size: 1.1em; outline: none; transition: 0.3s; color: #000; width: 100%;
+        }
+        #reminders .form-field select {
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12'%3E%3Cpath fill='%23000' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: left 15px center; padding-left: 35px;
+        }
+        #reminders .form-field textarea { min-height: 90px; resize: vertical; }
+
+        #reminders .tone-selector-container {
+            display: flex; gap: 8px; align-items: center;
+        }
+        #reminders .btn-preview-tone {
+            background: var(--teal); color: white !important; border: none; padding: 12px; border-radius: 10px;
+            cursor: pointer; font-size: 1em; display: inline-flex; align-items: center; justify-content: center; min-width: 45px;
+        }
+
+        #reminders .btn-add {
+            width: 100%; padding: 14px; border: none; border-radius: 12px; color: white !important;
+            font-size: 1.2em; cursor: pointer; background: linear-gradient(135deg, var(--teal), var(--mint));
+        }
+
+        /* Modal التنبيه ومعاينة الصور */
+        .alarm-modal, .image-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .alarm-modal.active, .image-modal.active { display: flex; }
+        .alarm-box, .image-box {
+            background: #fff; border-radius: 20px; padding: 25px; text-align: center; max-width: 450px; width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: popIn 0.3s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .alarm-icon { font-size: 60px; margin-bottom: 10px; animation: ring 0.5s ease infinite alternate; }
+        @keyframes ring { from { transform: rotate(-15deg); } to { transform: rotate(15deg); } }
+        .alarm-title { font-size: 1.4em; font-weight: 800; color: var(--purple-dark); margin-bottom: 10px; }
+        .alarm-content { font-size: 1em; color: var(--text-secondary); margin-bottom: 20px; }
+        .alarm-btn { background: var(--purple); color: #fff; border: none; padding: 10px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(150px); background: #333; color: white; padding: 12px 25px; border-radius: 20px; z-index: 1000; transition: 0.4s; display: flex; gap: 10px; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media print {
+            .header, .date-card, .tabs-wrapper, .stats-bar, .toolbar, .add-card, .search-box, .item-actions, .toast, .alarm-modal, .image-modal { display: none !important; }
+            #meetings .item-card { border: 1px solid #999; break-inside: avoid; }
+            body { background: #fff; }
+        }
+
+        @media (max-width: 600px) {
+            .tab-btn span:not(.tab-icon) { display: none; }
+            .tab-btn.active span:not(.tab-icon) { display: inline; }
+            #meetings .form-row, #inquiries .form-row, #reminders .form-row { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+<audio id="salawatAudio" preload="auto" src="data:audio/mpeg;base64,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qqqqqqqqqqqqqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/zYsRvAAADSAAAAACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/82LEbwAAA0gAAAAAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NixG8AAANIAAAAAKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqTEFNRTMuMTAwqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/zYMRwAAADSAAAAACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqkxBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv/zYsRvAAADSAAAAACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqr/82LEbwAAA0gAAAAAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"></audio>
+
+
+    <header class="header">
+        <div class="diary-icon">📔</div>
+        <h1>مدونتي</h1>
+        <div class="subtitle">✨ يومياتي الخاصة ✨</div>
+    </header>
+
+    <div class="date-card">
+        <div class="date-day" id="dateDay">اليوم</div>
+        <div class="date-full" id="dateFull">التاريخ</div>
+    </div>
+
+    <div class="container">
+
+        <!-- شريط الإحصائيات السريعة -->
+        <div class="stats-bar">
+            <div class="stat-box">
+                <span class="stat-num" id="statMeetingsWeek">0</span>
+                <span class="stat-label">اجتماعات الأسبوع</span>
+            </div>
+            <div class="stat-box orange">
+                <span class="stat-num" id="statPendingInquiries">0</span>
+                <span class="stat-label">استفسارات معلّقة</span>
+            </div>
+            <div class="stat-box teal">
+                <span class="stat-num" id="statUpcomingReminders">0</span>
+                <span class="stat-label">تذكيرات قادمة</span>
+            </div>
+            <div class="stat-box green">
+                <span class="stat-num" id="statDoneInquiries">0</span>
+                <span class="stat-label">معاملات منجزة</span>
+            </div>
+        </div>
+
+        <!-- أدوات عامة -->
+        <div class="toolbar">
+            <button class="tool-btn" onclick="exportData()">⬇️ نسخ احتياطي</button>
+            <label class="tool-btn" style="margin:0;">
+                ⬆️ استيراد
+                <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importData(this)">
+            </label>
+            <button class="tool-btn" id="notifBtn" onclick="requestNotificationPermission()">🔕 تفعيل تنبيهات النظام</button>
+        </div>
+
+        <!-- التبويبات -->
+        <div class="tabs-wrapper">
+            <button class="tab-btn active" data-tab="meetings" onclick="switchTab('meetings', this)">
+                <span class="tab-icon">🤝</span>
+                <span>الاجتماعات</span>
+            </button>
+            <button class="tab-btn" data-tab="inquiries" onclick="switchTab('inquiries', this)">
+                <span class="tab-icon">📄</span>
+                <span>استفسار معاملة</span>
+            </button>
+            <button class="tab-btn" data-tab="reminders" onclick="switchTab('reminders', this)">
+                <span class="tab-icon">🔔</span>
+                <span>تذكير</span>
+            </button>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- تبويب الاجتماعات -->
+        <!-- ========================================= -->
+        <div class="tab-content active" id="meetings">
+            <div class="add-card">
+                <div class="add-title">
+                    <div class="title-icon">🤝</div>
+                    <span id="meetingFormTitle">إضافة اجتماع جديد</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>تاريخ الاجتماع</label>
+                        <input type="date" id="meetingDate">
+                    </div>
+                    <div class="form-field">
+                        <label>الوقت</label>
+                        <input type="time" id="meetingTime">
+                    </div>
+                    <div class="form-field full">
+                        <label>الموضوع</label>
+                        <input type="text" id="meetingTitle" placeholder="مثال: مناقشة خطة العمل">
+                    </div>
+                    <div class="form-field">
+                        <label>المكان</label>
+                        <select id="meetingLocation">
+                            <option value="">– اختر المكان –</option>
+                            <option value="قاعة الرؤية بمكتب المدير العام">قاعة الرؤية بمكتب المدير العام</option>
+                            <option value="مكتب مدير الدائرة">مكتب مدير الدائرة</option>
+                            <option value="مكتب المدير المساعد">مكتب المدير المساعد</option>
+                            <option value="قسم إثبات الملك">قسم إثبات الملك</option>
+                            <option value="قسم الانتفاع">قسم الانتفاع</option>
+                            <option value="قسم الخيارات الإسكانية">قسم الخيارات الإسكانية</option>
+                            <option value="قسم الاسكان الاجتماعي والمشاريع">قسم الاسكان الاجتماعي والمشاريع</option>
+                            <option value="قسم التطوير العقاري">قسم التطوير العقاري</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>القسم</label>
+                        <select id="meetingAttendees">
+                            <option value="">– اختر القسم –</option>
+                            <option value="جميع موظفي الدائرة">جميع موظفي الدائرة</option>
+                            <option value="رؤساء الأقسام بالدائرة">رؤساء الأقسام بالدائرة</option>
+                            <option value="قسم الخيارات الإسكانية والأراضي">قسم الخيارات الإسكانية والأراضي</option>
+                            <option value="قسم الانتفاع بالأراضي">قسم الانتفاع بالأراضي</option>
+                            <option value="قسم التطوير العقاري">قسم التطوير العقاري</option>
+                            <option value="قسم إثبات وتسجيل الملك">قسم إثبات وتسجيل الملك</option>
+                            <option value="قسم الإسكان الاجتماعي والمشاريع">قسم الإسكان الاجتماعي والمشاريع</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-add" id="meetingSaveBtn" onclick="addMeeting()">حفظ الاجتماع</button>
+                <button class="btn-cancel-edit" id="meetingCancelBtn" onclick="cancelMeetingEdit()">إلغاء التعديل</button>
+            </div>
+
+            <div class="section-header">
+                <div class="section-title">
+                    <span>اجتماعاتي</span>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-print" onclick="window.print()">🖨️ طباعة</button>
+                    <button class="btn-wa-all" onclick="sendAllMeetingsWhatsApp()">
+                        💬 إرسال الكل واتساب
+                    </button>
+                </div>
+            </div>
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="meetingSearch" placeholder="ابحث بالموضوع أو المكان أو القسم..." oninput="renderMeetings()">
+            </div>
+            <div id="meetingsList"></div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- تبويب استفسار عن معاملة -->
+        <!-- ========================================= -->
+        <div class="tab-content" id="inquiries">
+            <div class="add-card">
+                <div class="add-title">
+                    <div class="title-icon">📄</div>
+                    <span id="inquiryFormTitle">إضافة استفسار عن معاملة</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>القسم</label>
+                        <select id="inquiryDept">
+                            <option value="">– اختر القسم –</option>
+                            <option value="قسم الخيارات الإسكانية والأراضي">قسم الخيارات الإسكانية والأراضي</option>
+                            <option value="قسم الانتفاع بالأراضي">قسم الانتفاع بالأراضي</option>
+                            <option value="قسم التطوير العقاري">قسم التطوير العقاري</option>
+                            <option value="قسم إثبات وتسجيل الملك">قسم إثبات وتسجيل الملك</option>
+                            <option value="قسم الإسكان الاجتماعي والمشاريع">قسم الإسكان الاجتماعي والمشاريع</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>رقم الطلب</label>
+                        <input type="text" id="inquiryOrderNo" placeholder="أدخل رقم الطلب">
+                    </div>
+                    <div class="form-field">
+                        <label>حالة المعاملة</label>
+                        <select id="inquiryStatus">
+                            <option value="pending">🟠 قيد المراجعة</option>
+                            <option value="done">🟢 منجزة</option>
+                            <option value="rejected">🔴 مرفوضة</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>تاريخ آخر متابعة</label>
+                        <input type="date" id="inquiryFollowUp">
+                    </div>
+                    <div class="form-field full">
+                        <label>تفاصيل أخرى</label>
+                        <textarea id="inquiryDetails" placeholder="أدخل تفاصيل الاستفسار هنا..."></textarea>
+                    </div>
+                    <div class="form-field full">
+                        <label>تصوير / إرفاق الإيصال</label>
+                        <label class="file-upload-btn">
+                            📷 <span>اضغط لتصوير أو اختيار صورة الإيصال</span>
+                            <input type="file" id="inquiryReceipt" accept="image/*" capture="environment" style="display:none;" onchange="handleReceiptUpload(this)">
+                        </label>
+                        <div class="preview-img-container" id="receiptPreviewBox">
+                            <img id="receiptPreviewImg" src="" alt="معاينة الإيصال">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-add" id="inquirySaveBtn" onclick="addInquiry()">حفظ الاستفسار</button>
+                <button class="btn-cancel-edit" id="inquiryCancelBtn" onclick="cancelInquiryEdit()">إلغاء التعديل</button>
+            </div>
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="inquirySearch" placeholder="ابحث برقم الطلب أو القسم..." oninput="renderInquiries()">
+            </div>
+            <div id="inquiriesList"></div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- تبويب التذكيرات (معدل بالنغمات) -->
+        <!-- ========================================= -->
+        <div class="tab-content" id="reminders">
+            <div class="add-card">
+                <div class="add-title">
+                    <div class="title-icon">🔔</div>
+                    <span id="reminderFormTitle">إضافة تذكير</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-field"><label>التاريخ</label><input type="date" id="reminderDate"></div>
+                    <div class="form-field"><label>الوقت</label><input type="time" id="reminderTime"></div>
+                    <div class="form-field full"><label>عنوان التذكير</label><input type="text" id="reminderTitle" placeholder="مثال: موعد تسليم التقرير"></div>
+
+                    <div class="form-field">
+                        <label>نغمة التنبيه</label>
+                        <div class="tone-selector-container">
+                            <select id="reminderTone">
+                                <option value="salawat">🕌 اللهم صلِّ على محمد</option>
+                            </select>
+                            <button class="btn-preview-tone" onclick="previewSelectedTone()" title="استماع للنغمة">🔊</button>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>التكرار</label>
+                        <select id="reminderRepeat">
+                            <option value="none">بدون تكرار</option>
+                            <option value="daily">يوميًا</option>
+                            <option value="weekly">أسبوعيًا</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field full"><label>تفاصيل التذكير</label><textarea id="reminderContent" placeholder="اكتب التفاصيل هنا..."></textarea></div>
+                </div>
+                <button class="btn-add" id="reminderSaveBtn" onclick="addReminder()">حفظ التذكير</button>
+                <button class="btn-cancel-edit" id="reminderCancelBtn" onclick="cancelReminderEdit()">إلغاء التعديل</button>
+            </div>
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="reminderSearch" placeholder="ابحث بعنوان التذكير..." oninput="renderReminders()">
+            </div>
+            <div id="remindersList"></div>
+        </div>
+    </div>
+
+    <!-- نافذة التنبيه المنبثقة -->
+    <div class="alarm-modal" id="alarmModal">
+        <div class="alarm-box">
+            <div class="alarm-icon">🔔</div>
+            <div class="alarm-title" id="alarmTitle">تنبيه!</div>
+            <div class="alarm-content" id="alarmContent">حان وقت التذكير</div>
+            <button class="alarm-btn" onclick="stopAlarm()">إغلاق التنبيه</button>
+        </div>
+    </div>
+
+    <!-- نافذة عرض صورة الإيصال المنبثقة -->
+    <div class="image-modal" id="imageModal">
+        <div class="image-box">
+            <h3 style="margin-bottom: 15px;">صورة الإيصال</h3>
+            <img id="modalReceiptImg" src="" style="max-width: 100%; max-height: 350px; border-radius: 10px; margin-bottom: 15px;">
+            <button class="alarm-btn" onclick="closeImageModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span id="toastIcon">✨</span>
+        <span id="toastMsg"></span>
+    </div>
+
+    <script>
+        let meetings = JSON.parse(localStorage.getItem('diary_meetings')) || [];
+        let inquiries = JSON.parse(localStorage.getItem('diary_inquiries')) || [];
+        let reminders = JSON.parse(localStorage.getItem('diary_reminders')) || [];
+        let currentReceiptBase64 = '';
+
+        let editingMeetingId = null;
+        let editingInquiryId = null;
+        let editingReminderId = null;
+
+        function todayISO() { return new Date().toISOString().split('T')[0]; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            document.getElementById('dateDay').textContent = now.toLocaleDateString('ar-SA', { weekday: 'long' });
+            document.getElementById('dateFull').textContent = now.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            document.getElementById('meetingDate').value = todayISO();
+            document.getElementById('reminderDate').value = todayISO();
+
+            renderMeetings();
+            renderInquiries();
+            renderReminders();
+            renderStats();
+            updateNotifButton();
+
+            setInterval(checkAlarms, 10000);
+        });
+
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function toast(icon, msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastIcon').textContent = icon;
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        /* ==================== الإحصائيات ==================== */
+        function renderStats() {
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0,0,0,0);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+            const meetingsThisWeek = meetings.filter(m => {
+                if (!m.date) return false;
+                const d = new Date(m.date);
+                return d >= startOfWeek && d < endOfWeek;
+            }).length;
+
+            const pendingInquiries = inquiries.filter(i => (i.status || 'pending') === 'pending').length;
+            const doneInquiries = inquiries.filter(i => i.status === 'done').length;
+
+            const upcoming = reminders.filter(r => {
+                if (!r.date) return false;
+                const d = new Date(r.date + 'T' + (r.time || '00:00'));
+                return d >= now;
+            }).length;
+
+            document.getElementById('statMeetingsWeek').textContent = meetingsThisWeek;
+            document.getElementById('statPendingInquiries').textContent = pendingInquiries;
+            document.getElementById('statDoneInquiries').textContent = doneInquiries;
+            document.getElementById('statUpcomingReminders').textContent = upcoming;
+        }
+
+        /* ==================== النسخ الاحتياطي والاستيراد ==================== */
+        function exportData() {
+            const payload = {
+                exportedAt: new Date().toISOString(),
+                meetings, inquiries, reminders
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `مدونتي-نسخة-احتياطية-${todayISO()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast('⬇️', 'تم تنزيل النسخة الاحتياطية');
+        }
+
+        function importData(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!confirm('سيتم استبدال كافة البيانات الحالية بالبيانات المستوردة. هل تريد المتابعة؟')) return;
+                    meetings = Array.isArray(data.meetings) ? data.meetings : [];
+                    inquiries = Array.isArray(data.inquiries) ? data.inquiries : [];
+                    reminders = Array.isArray(data.reminders) ? data.reminders : [];
+                    localStorage.setItem('diary_meetings', JSON.stringify(meetings));
+                    localStorage.setItem('diary_inquiries', JSON.stringify(inquiries));
+                    localStorage.setItem('diary_reminders', JSON.stringify(reminders));
+                    renderMeetings(); renderInquiries(); renderReminders(); renderStats();
+                    toast('✅', 'تم استيراد البيانات بنجاح');
+                } catch (err) {
+                    toast('⚠️', 'ملف غير صالح');
+                }
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        /* ==================== تنبيهات النظام (Notification API) ==================== */
+        function updateNotifButton() {
+            const btn = document.getElementById('notifBtn');
+            if (!('Notification' in window)) { btn.textContent = '🔕 غير مدعوم في هذا المتصفح'; return; }
+            if (Notification.permission === 'granted') {
+                btn.textContent = '🔔 تنبيهات النظام مفعّلة';
+                btn.classList.add('notif-on');
+            } else {
+                btn.textContent = '🔕 تفعيل تنبيهات النظام';
+                btn.classList.remove('notif-on');
+            }
+        }
+
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) return toast('⚠️', 'المتصفح لا يدعم هذه الخاصية');
+            Notification.requestPermission().then(() => {
+                updateNotifButton();
+                if (Notification.permission === 'granted') {
+                    toast('🔔', 'ستصلك تنبيهات النظام طالما المتصفح مفتوحًا');
+                }
+            });
+        }
+
+        function fireSystemNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try { new Notification(title, { body: body || '', icon: 'icon-192.png' }); } catch(e) {}
+            }
+        }
+
+        /* ==================== برمجة الاجتماعات ==================== */
+        function addMeeting() {
+            const date = document.getElementById('meetingDate').value;
+            const time = document.getElementById('meetingTime').value;
+            const title = document.getElementById('meetingTitle').value.trim();
+            const location = document.getElementById('meetingLocation').value;
+            const attendees = document.getElementById('meetingAttendees').value;
+
+            if (!title) return toast('⚠️', 'يرجى إدخال موضوع الاجتماع');
+
+            if (editingMeetingId) {
+                const m = meetings.find(x => x.id === editingMeetingId);
+                if (m) { m.date = date; m.time = time; m.title = title; m.location = location; m.attendees = attendees; }
+                cancelMeetingEdit();
+                toast('✏️', 'تم تحديث الاجتماع');
+            } else {
+                meetings.push({ id: Date.now(), date, time, title, location, attendees });
+                toast('🤝', 'تم حفظ الاجتماع');
+            }
+
+            localStorage.setItem('diary_meetings', JSON.stringify(meetings));
+
+            document.getElementById('meetingTitle').value = '';
+            document.getElementById('meetingLocation').value = '';
+            document.getElementById('meetingAttendees').value = '';
+            document.getElementById('meetingTime').value = '';
+
+            renderMeetings();
+            renderStats();
+        }
+
+        function editMeeting(id) {
+            const m = meetings.find(x => x.id === id);
+            if (!m) return;
+            editingMeetingId = id;
+            document.getElementById('meetingDate').value = m.date || '';
+            document.getElementById('meetingTime').value = m.time || '';
+            document.getElementById('meetingTitle').value = m.title || '';
+            document.getElementById('meetingLocation').value = m.location || '';
+            document.getElementById('meetingAttendees').value = m.attendees || '';
+            document.getElementById('meetingFormTitle').textContent = 'تعديل الاجتماع';
+            document.getElementById('meetingSaveBtn').textContent = 'تحديث الاجتماع';
+            document.getElementById('meetingSaveBtn').classList.add('editing');
+            document.getElementById('meetingCancelBtn').classList.add('show');
+            document.querySelector('[data-tab="meetings"]').click();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelMeetingEdit() {
+            editingMeetingId = null;
+            document.getElementById('meetingFormTitle').textContent = 'إضافة اجتماع جديد';
+            document.getElementById('meetingSaveBtn').textContent = 'حفظ الاجتماع';
+            document.getElementById('meetingSaveBtn').classList.remove('editing');
+            document.getElementById('meetingCancelBtn').classList.remove('show');
+            document.getElementById('meetingTitle').value = '';
+            document.getElementById('meetingLocation').value = '';
+            document.getElementById('meetingAttendees').value = '';
+            document.getElementById('meetingTime').value = '';
+        }
+
+        function deleteMeeting(id) {
+            if (confirm('هل تريد حذف هذا الاجتماع؟')) {
+                meetings = meetings.filter(m => m.id !== id);
+                localStorage.setItem('diary_meetings', JSON.stringify(meetings));
+                if (editingMeetingId === id) cancelMeetingEdit();
+                renderMeetings();
+                renderStats();
+                toast('🗑️', 'تم الحذف');
+            }
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            const [h, m] = timeStr.split(':');
+            const hour = parseInt(h);
+            return `${hour % 12 || 12}:${m} ${hour >= 12 ? 'م' : 'ص'}`;
+        }
+
+        function renderMeetings() {
+            const container = document.getElementById('meetingsList');
+            const q = (document.getElementById('meetingSearch').value || '').trim();
+
+            let filtered = meetings;
+            if (q) {
+                filtered = meetings.filter(m =>
+                    (m.title || '').includes(q) || (m.location || '').includes(q) || (m.attendees || '').includes(q)
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:#000;">${q ? 'لا توجد نتائج مطابقة' : 'لا توجد اجتماعات مضافة'}</div>`;
+                return;
+            }
+
+            const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+            container.innerHTML = sorted.map(m => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-title">${m.title}</div>
+                        <div class="item-actions">
+                            <button class="action-btn edit-btn" onclick="editMeeting(${m.id})" title="تعديل">✏️</button>
+                            <button class="action-btn wa-btn" onclick="sendSingleWhatsApp(${m.id})" title="إرسال عبر واتساب">💬</button>
+                            <button class="action-btn del-btn" onclick="deleteMeeting(${m.id})" title="حذف">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="meta-badge">📅 ${m.date}</span>
+                        ${m.time ? `<span class="meta-badge">🕐 ${formatTime(m.time)}</span>` : ''}
+                        ${m.location ? `<span class="meta-badge">📍 ${m.location}</span>` : ''}
+                        ${m.attendees ? `<span class="meta-badge">🏢 ${m.attendees}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* ==================== برمجة الاستفسار عن معاملة ==================== */
+        function handleReceiptUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentReceiptBase64 = e.target.result;
+                    document.getElementById('receiptPreviewImg').src = currentReceiptBase64;
+                    document.getElementById('receiptPreviewBox').style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function getStatusLabel(status) {
+            if (status === 'done') return { text: '🟢 منجزة', cls: 'done' };
+            if (status === 'rejected') return { text: '🔴 مرفوضة', cls: 'rejected' };
+            return { text: '🟠 قيد المراجعة', cls: 'pending' };
+        }
+
+        function addInquiry() {
+            const dept = document.getElementById('inquiryDept').value;
+            const orderNo = document.getElementById('inquiryOrderNo').value.trim();
+            const details = document.getElementById('inquiryDetails').value.trim();
+            const status = document.getElementById('inquiryStatus').value;
+            const followUp = document.getElementById('inquiryFollowUp').value;
+
+            if (!dept) return toast('⚠️', 'يرجى اختيار القسم');
+            if (!orderNo) return toast('⚠️', 'يرجى إدخال رقم الطلب');
+
+            if (editingInquiryId) {
+                const item = inquiries.find(x => x.id === editingInquiryId);
+                if (item) {
+                    item.dept = dept; item.orderNo = orderNo; item.details = details;
+                    item.status = status; item.followUp = followUp;
+                    if (currentReceiptBase64) item.receiptImg = currentReceiptBase64;
+                }
+                cancelInquiryEdit();
+                toast('✏️', 'تم تحديث الاستفسار');
+            } else {
+                inquiries.push({
+                    id: Date.now(),
+                    date: todayISO(),
+                    dept, orderNo, details, status, followUp,
+                    receiptImg: currentReceiptBase64
+                });
+                toast('📄', 'تم حفظ الاستفسار');
+            }
+
+            localStorage.setItem('diary_inquiries', JSON.stringify(inquiries));
+
+            document.getElementById('inquiryDept').value = '';
+            document.getElementById('inquiryOrderNo').value = '';
+            document.getElementById('inquiryDetails').value = '';
+            document.getElementById('inquiryStatus').value = 'pending';
+            document.getElementById('inquiryFollowUp').value = '';
+            document.getElementById('inquiryReceipt').value = '';
+            document.getElementById('receiptPreviewBox').style.display = 'none';
+            currentReceiptBase64 = '';
+
+            renderInquiries();
+            renderStats();
+        }
+
+        function editInquiry(id) {
+            const item = inquiries.find(x => x.id === id);
+            if (!item) return;
+            editingInquiryId = id;
+            document.getElementById('inquiryDept').value = item.dept || '';
+            document.getElementById('inquiryOrderNo').value = item.orderNo || '';
+            document.getElementById('inquiryDetails').value = item.details || '';
+            document.getElementById('inquiryStatus').value = item.status || 'pending';
+            document.getElementById('inquiryFollowUp').value = item.followUp || '';
+            currentReceiptBase64 = item.receiptImg || '';
+            if (currentReceiptBase64) {
+                document.getElementById('receiptPreviewImg').src = currentReceiptBase64;
+                document.getElementById('receiptPreviewBox').style.display = 'block';
+            }
+            document.getElementById('inquiryFormTitle').textContent = 'تعديل الاستفسار';
+            document.getElementById('inquirySaveBtn').textContent = 'تحديث الاستفسار';
+            document.getElementById('inquirySaveBtn').classList.add('editing');
+            document.getElementById('inquiryCancelBtn').classList.add('show');
+            document.querySelector('[data-tab="inquiries"]').click();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelInquiryEdit() {
+            editingInquiryId = null;
+            document.getElementById('inquiryFormTitle').textContent = 'إضافة استفسار عن معاملة';
+            document.getElementById('inquirySaveBtn').textContent = 'حفظ الاستفسار';
+            document.getElementById('inquirySaveBtn').classList.remove('editing');
+            document.getElementById('inquiryCancelBtn').classList.remove('show');
+            document.getElementById('inquiryDept').value = '';
+            document.getElementById('inquiryOrderNo').value = '';
+            document.getElementById('inquiryDetails').value = '';
+            document.getElementById('inquiryStatus').value = 'pending';
+            document.getElementById('inquiryFollowUp').value = '';
+            document.getElementById('inquiryReceipt').value = '';
+            document.getElementById('receiptPreviewBox').style.display = 'none';
+            currentReceiptBase64 = '';
+        }
+
+        function deleteInquiry(id) {
+            if (confirm('هل تريد حذف هذا الاستفسار؟')) {
+                inquiries = inquiries.filter(i => i.id !== id);
+                localStorage.setItem('diary_inquiries', JSON.stringify(inquiries));
+                if (editingInquiryId === id) cancelInquiryEdit();
+                renderInquiries();
+                renderStats();
+                toast('🗑️', 'تم الحذف');
+            }
+        }
+
+        function viewReceipt(id) {
+            const item = inquiries.find(i => i.id === id);
+            if (item && item.receiptImg) {
+                document.getElementById('modalReceiptImg').src = item.receiptImg;
+                document.getElementById('imageModal').classList.add('active');
+            }
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        function sendInquiryWhatsApp(id) {
+            const item = inquiries.find(i => i.id === id);
+            if (!item) return;
+
+            let text = `📄 *استفسار عن معاملة*\n\n`;
+            text += `🏢 *القسم:* ${item.dept}\n`;
+            text += `🔢 *رقم الطلب:* ${item.orderNo}\n`;
+            text += `📅 *تاريخ التسجيل:* ${item.date}\n`;
+            text += `📌 *الحالة:* ${getStatusLabel(item.status).text}\n`;
+            if (item.followUp) text += `🗓️ *آخر متابعة:* ${item.followUp}\n`;
+            if (item.details) text += `📝 *تفاصيل أخرى:* ${item.details}\n`;
+
+            openWhatsAppAPI(text);
+        }
+
+        function renderInquiries() {
+            const container = document.getElementById('inquiriesList');
+            const q = (document.getElementById('inquirySearch').value || '').trim();
+
+            let filtered = inquiries;
+            if (q) {
+                filtered = inquiries.filter(i =>
+                    (i.orderNo || '').includes(q) || (i.dept || '').includes(q) || (i.details || '').includes(q)
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:#000;">${q ? 'لا توجد نتائج مطابقة' : 'لا توجد استفسارات مضافة'}</div>`;
+                return;
+            }
+
+            const sorted = [...filtered].sort((a, b) => b.id - a.id);
+            container.innerHTML = sorted.map(item => {
+                const st = getStatusLabel(item.status);
+                return `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-title">طلب رقم: ${item.orderNo}</div>
+                        <div class="item-actions">
+                            ${item.receiptImg ? `<button class="action-btn img-btn" onclick="viewReceipt(${item.id})" title="عرض الإيصال">📷</button>` : ''}
+                            <button class="action-btn edit-btn" onclick="editInquiry(${item.id})" title="تعديل">✏️</button>
+                            <button class="action-btn wa-btn" onclick="sendInquiryWhatsApp(${item.id})" title="إرسال عبر واتساب">💬</button>
+                            <button class="action-btn del-btn" onclick="deleteInquiry(${item.id})" title="حذف">🗑️</button>
+                        </div>
+                    </div>
+                    ${item.details ? `<div style="margin-bottom:10px; color:#000;">${item.details}</div>` : ''}
+                    <div class="item-meta">
+                        <span class="status-badge ${st.cls}">${st.text}</span>
+                        <span class="meta-badge">🏢 ${item.dept}</span>
+                        <span class="meta-badge">📅 ${item.date}</span>
+                        ${item.followUp ? `<span class="meta-badge">🗓️ متابعة: ${item.followUp}</span>` : ''}
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        /* ==================== برمجة التذكيرات والنغمات ==================== */
+        function addReminder() {
+            const date = document.getElementById('reminderDate').value;
+            const time = document.getElementById('reminderTime').value;
+            const title = document.getElementById('reminderTitle').value.trim();
+            const tone = document.getElementById('reminderTone').value;
+            const repeat = document.getElementById('reminderRepeat').value;
+            const content = document.getElementById('reminderContent').value.trim();
+
+            if (!title) return toast('⚠️', 'يرجى إدخال عنوان التذكير');
+
+            if (editingReminderId) {
+                const r = reminders.find(x => x.id === editingReminderId);
+                if (r) {
+                    r.date = date; r.time = time; r.title = title; r.tone = tone || 'salawat';
+                    r.repeat = repeat || 'none'; r.content = content; r.notified = false;
+                }
+                cancelReminderEdit();
+                toast('✏️', 'تم تحديث التذكير');
+            } else {
+                reminders.push({ id: Date.now(), date, time, title, tone: tone || 'salawat', repeat: repeat || 'none', content, notified: false });
+                toast('🔔', 'تم حفظ التذكير');
+            }
+
+            localStorage.setItem('diary_reminders', JSON.stringify(reminders));
+
+            document.getElementById('reminderTitle').value = '';
+            document.getElementById('reminderContent').value = '';
+            document.getElementById('reminderTime').value = '';
+            document.getElementById('reminderRepeat').value = 'none';
+
+            renderReminders();
+            renderStats();
+        }
+
+        function editReminder(id) {
+            const r = reminders.find(x => x.id === id);
+            if (!r) return;
+            editingReminderId = id;
+            document.getElementById('reminderDate').value = r.date || '';
+            document.getElementById('reminderTime').value = r.time || '';
+            document.getElementById('reminderTitle').value = r.title || '';
+            document.getElementById('reminderTone').value = r.tone || 'salawat';
+            document.getElementById('reminderRepeat').value = r.repeat || 'none';
+            document.getElementById('reminderContent').value = r.content || '';
+            document.getElementById('reminderFormTitle').textContent = 'تعديل التذكير';
+            document.getElementById('reminderSaveBtn').textContent = 'تحديث التذكير';
+            document.getElementById('reminderSaveBtn').classList.add('editing');
+            document.getElementById('reminderCancelBtn').classList.add('show');
+            document.querySelector('[data-tab="reminders"]').click();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelReminderEdit() {
+            editingReminderId = null;
+            document.getElementById('reminderFormTitle').textContent = 'إضافة تذكير';
+            document.getElementById('reminderSaveBtn').textContent = 'حفظ التذكير';
+            document.getElementById('reminderSaveBtn').classList.remove('editing');
+            document.getElementById('reminderCancelBtn').classList.remove('show');
+            document.getElementById('reminderTitle').value = '';
+            document.getElementById('reminderContent').value = '';
+            document.getElementById('reminderTime').value = '';
+            document.getElementById('reminderRepeat').value = 'none';
+        }
+
+        function deleteReminder(id) {
+            if (confirm('هل تريد حذف هذا التذكير؟')) {
+                reminders = reminders.filter(r => r.id !== id);
+                localStorage.setItem('diary_reminders', JSON.stringify(reminders));
+                if (editingReminderId === id) cancelReminderEdit();
+                renderReminders();
+                renderStats();
+                toast('🗑️', 'تم الحذف');
+            }
+        }
+
+        function getToneName(toneKey) {
+            return '🕌 اللهم صلِّ على محمد';
+        }
+
+        function getRepeatLabel(repeat) {
+            if (repeat === 'daily') return '🔁 يوميًا';
+            if (repeat === 'weekly') return '🔁 أسبوعيًا';
+            return '';
+        }
+
+        function renderReminders() {
+            const container = document.getElementById('remindersList');
+            const q = (document.getElementById('reminderSearch').value || '').trim();
+
+            let filtered = reminders;
+            if (q) {
+                filtered = reminders.filter(r => (r.title || '').includes(q) || (r.content || '').includes(q));
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:#000;">${q ? 'لا توجد نتائج مطابقة' : 'لا توجد تذكيرات مضافة'}</div>`;
+                return;
+            }
+
+            const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+            container.innerHTML = sorted.map(r => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-title">${r.title}</div>
+                        <div class="item-actions">
+                            <button class="action-btn edit-btn" onclick="editReminder(${r.id})" title="تعديل">✏️</button>
+                            <button class="action-btn del-btn" onclick="deleteReminder(${r.id})" title="حذف">🗑️</button>
+                        </div>
+                    </div>
+                    ${r.content ? `<div style="margin-bottom:10px; color:#000;">${r.content}</div>` : ''}
+                    <div class="item-meta">
+                        <span class="meta-badge">📅 ${r.date}</span>
+                        ${r.time ? `<span class="meta-badge">🔔 ${formatTime(r.time)}</span>` : ''}
+                        <span class="meta-badge">🎵 ${getToneName(r.tone)}</span>
+                        ${r.repeat && r.repeat !== 'none' ? `<span class="meta-badge">${getRepeatLabel(r.repeat)}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* تشغيل نغمة التذكير: مقطع صوتي حقيقي "اللهم صلِّ على محمد" */
+        function playTone(toneType) {
+            try {
+                const audio = document.getElementById('salawatAudio');
+                audio.currentTime = 0;
+                audio.play().catch(() => {});
+            } catch(e) {}
+        }
+
+        function previewSelectedTone() {
+            const tone = document.getElementById('reminderTone').value;
+            playTone(tone);
+        }
+
+        function startAlarmSound(toneType) {
+            const audio = document.getElementById('salawatAudio');
+            audio.loop = true;
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        }
+
+        function nextRepeatDate(dateStr, repeat) {
+            const d = new Date(dateStr);
+            if (repeat === 'daily') d.setDate(d.getDate() + 1);
+            else if (repeat === 'weekly') d.setDate(d.getDate() + 7);
+            return d.toISOString().split('T')[0];
+        }
+
+        function checkAlarms() {
+            const now = new Date();
+            const currDate = now.toISOString().split('T')[0];
+            const currTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            let changed = false;
+            reminders.forEach(r => {
+                if (!r.notified && r.date === currDate && r.time === currTime) {
+                    r.notified = true;
+                    changed = true;
+                    triggerAlarm(r.title, r.content, r.tone);
+
+                    if (r.repeat === 'daily' || r.repeat === 'weekly') {
+                        r.date = nextRepeatDate(r.date, r.repeat);
+                        r.notified = false;
+                    }
+                }
+            });
+            if (changed) {
+                localStorage.setItem('diary_reminders', JSON.stringify(reminders));
+                renderReminders();
+                renderStats();
+            }
+        }
+
+        function triggerAlarm(title, content, toneType) {
+            startAlarmSound(toneType || 'salawat');
+            document.getElementById('alarmTitle').textContent = `🔔 تنبيه: ${title}`;
+            document.getElementById('alarmContent').textContent = content || 'حان الوقت المحدد لتذكيرك!';
+            document.getElementById('alarmModal').classList.add('active');
+            fireSystemNotification(`🔔 تنبيه: ${title}`, content || 'حان الوقت المحدد لتذكيرك!');
+        }
+
+        function stopAlarm() {
+            document.getElementById('alarmModal').classList.remove('active');
+            const audio = document.getElementById('salawatAudio');
+            audio.loop = false;
+            audio.pause();
+            audio.currentTime = 0;
+        }
+
+        /* ==================== وظائف الواتساب ==================== */
+        function openWhatsAppAPI(text) {
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            const win = window.open(url, '_blank');
+            if (!win) window.location.href = url;
+        }
+
+        function sendSingleWhatsApp(id) {
+            const m = meetings.find(x => x.id === id);
+            if(!m) return;
+
+            let text = `🤝 *تفاصيل الاجتماع*\n\n`;
+            text += `📌 *الموضوع:* ${m.title}\n`;
+            text += `📅 *التاريخ:* ${m.date}\n`;
+            if(m.time) text += `🕐 *الوقت:* ${formatTime(m.time)}\n`;
+            if(m.location) text += `📍 *المكان:* ${m.location}\n`;
+            if(m.attendees) text += `🏢 *القسم:* ${m.attendees}\n`;
+
+            openWhatsAppAPI(text);
+        }
+
+        function sendAllMeetingsWhatsApp() {
+            if(meetings.length === 0) return toast('⚠️', 'لا توجد اجتماعات لإرسالها');
+
+            let text = `🤝 *قائمة الاجتماعات المجدولة*\n\n`;
+            meetings.forEach((m, i) => {
+                text += `*${i+1}. ${m.title}*\n`;
+                text += `📅 التاريخ: ${m.date}`;
+                if(m.time) text += ` - 🕐 الوقت: ${formatTime(m.time)}`;
+                text += `\n`;
+                if(m.location) text += `📍 المكان: ${m.location}\n`;
+                if(m.attendees) text += `🏢 القسم: ${m.attendees}\n`;
+                text += `──────────────\n`;
+            });
+
+            openWhatsAppAPI(text);
+        }
+    </script>
+
+    <!-- تسجيل الـ Service Worker لـ PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('Service Worker Registered Successfully'))
+            .catch((err) => console.log('Service Worker Registration Failed:', err));
+        });
+      }
+    </script>
+</body>
+</html>
